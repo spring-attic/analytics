@@ -1,0 +1,15 @@
+# Spring Cloud Stream Analytics Applications
+
+---
+
+### counter sink
+*Description*: TODO
+
+include::spring-cloud-starter-stream-sink-counter/README.adoc[]
+
+---
+
+### counter processor
+*Description*: TODO
+
+include::spring-cloud-starter-stream-processor-counter/README.adoc[]
