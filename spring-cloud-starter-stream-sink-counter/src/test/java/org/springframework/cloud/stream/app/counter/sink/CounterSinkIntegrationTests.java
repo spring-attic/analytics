@@ -106,10 +106,9 @@ public abstract class CounterSinkIntegrationTests {
 			assertThat(StreamSupport.stream(counterMeter.measure().spliterator(), false)
 					.mapToDouble(m -> m.getValue()).sum(), is(13.0));
 
-			assertThat(counterMeter.getId().getTags().size(), is(3));
+			assertThat(counterMeter.getId().getTags().size(), is(2));
 			assertThat(counterMeter.getId().getTag("foo"), is("bar"));
 			assertThat(counterMeter.getId().getTag("gork"), is("bork"));
-			assertThat(counterMeter.getId().getTag("counterType"), is("message"));
 		}
 	}
 

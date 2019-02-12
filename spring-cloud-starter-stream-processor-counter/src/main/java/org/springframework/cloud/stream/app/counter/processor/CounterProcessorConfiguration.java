@@ -22,17 +22,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.app.analytics.common.CounterCommonConfiguration;
 import org.springframework.cloud.stream.app.analytics.common.CounterService;
-import org.springframework.cloud.stream.app.analytics.common.OnMissingStreamFunctionDefinitionCondition;
 import org.springframework.cloud.stream.messaging.Processor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.SendTo;
 
 
 /**
@@ -53,15 +50,10 @@ public class CounterProcessorConfiguration {
 	@Autowired
 	private CounterService counterService;
 
-
-	// Use the spring.cloud.stream.function.definition to override the default function composition.
-	@Bean
-	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
-	public IntegrationFlow defaultProcessorFlow(Processor processor) {
-		return IntegrationFlows
-				.from(processor.input())
-				.transform(Message.class, message -> this.counterService.count(message))
-				.channel(processor.output())
-				.get();
+	@StreamListener(Processor.INPUT)
+	@SendTo(Processor.OUTPUT)
+	public Object evaluate(Message<?> input) {
+		this.counterService.count(input);
+		return input;
 	}
 }

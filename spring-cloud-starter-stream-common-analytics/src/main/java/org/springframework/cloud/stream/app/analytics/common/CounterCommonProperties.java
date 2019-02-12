@@ -21,8 +21,6 @@ import java.util.Map;
 
 import javax.validation.constraints.AssertTrue;
 
-import io.micrometer.core.instrument.Tag;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
@@ -36,11 +34,6 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("counter")
 @Validated
 public class CounterCommonProperties {
-
-	public static final String COUNTER_TYPE = "counterType";
-	public static final String COMPUTED_COUNTER_TYPE = "computed";
-	public static final String MESSAGE_COUNTER_TYPE = "message";
-	public static final Tag MESSAGE_TAG = Tag.of(COUNTER_TYPE, MESSAGE_COUNTER_TYPE);
 
 	/**
 	 * The default name of the increment

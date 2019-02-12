@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.stream.app.analytics.common;
 
 import java.util.Arrays;
@@ -28,8 +44,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import static org.springframework.cloud.stream.app.analytics.common.CounterCommonProperties.MESSAGE_TAG;
-
 /**
  * @author Christian Tzolov
  */
@@ -37,6 +51,8 @@ import static org.springframework.cloud.stream.app.analytics.common.CounterCommo
 public class DefaultCounterService implements CounterService {
 
 	private static final Log logger = LogFactory.getLog(DefaultCounterService.class);
+
+	public static final String MESSAGE_COUNTER_PREFIX = "message.";
 
 	private CounterCommonProperties properties;
 
@@ -50,9 +66,8 @@ public class DefaultCounterService implements CounterService {
 
 	@PostConstruct
 	public void init() {
-
 		this.context = ExpressionUtils.createStandardEvaluationContext(this.beanFactory);
-		logger.info("Counter Properties:  " + properties.toString());
+		logger.info("Counter Properties: " + properties.toString());
 	}
 
 	public DefaultCounterService(CounterCommonProperties properties, ObjectMapper mapper, MeterRegistry[] meterRegistries, BeanFactory beanFactory) {
@@ -71,7 +86,7 @@ public class DefaultCounterService implements CounterService {
 		Tags fixedTags = this.toTags(this.properties.getTag().getFixed());
 
 		// Message Counter
-		this.increment("message." + counterName, Tags.of(fixedTags).and(MESSAGE_TAG));
+		this.increment(this.toMessageCounterName(counterName), Tags.of(fixedTags));
 
 		Map<String, List<Tag>> allGroupedTags = new HashMap<>();
 		// Tag Expressions Counter
@@ -86,7 +101,6 @@ public class DefaultCounterService implements CounterService {
 					.collect(Collectors.groupingBy(tag -> tag.getKey(), Collectors.toList()));
 
 			allGroupedTags.putAll(groupedTags);
-			//this.count(counterName, fixedTags, groupedTags);
 		}
 
 		// Field Name/Value Tags Counter
@@ -104,6 +118,10 @@ public class DefaultCounterService implements CounterService {
 		this.count(counterName, fixedTags, allGroupedTags);
 
 		return message;
+	}
+
+	protected String toMessageCounterName(String commonCounterName) {
+		return MESSAGE_COUNTER_PREFIX + commonCounterName;
 	}
 
 	private void count(String counterName, Tags fixedTags, Map<String, List<Tag>> groupedTags) {
@@ -202,13 +220,6 @@ public class DefaultCounterService implements CounterService {
 			}
 		}
 		return Collections.emptyList();
-	}
-
-	private void count(String counterName, Tags commonTags, List<Tag> exclusiveTags) {
-		logger.info("Counter:" + counterName + ", commonTags: " + commonTags + ", exclusive tags:" + exclusiveTags);
-		exclusiveTags.stream()
-				.filter(tag -> StringUtils.hasText(tag.getKey()) && StringUtils.hasText(tag.getValue()))
-				.forEach(tag -> this.increment(counterName, Tags.of(commonTags).and(tag)));
 	}
 
 	/**

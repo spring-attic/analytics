@@ -60,7 +60,7 @@ public abstract class CounterProcessorIntegrationTests {
 	})
 	public static class CounterPayloadTests extends CounterProcessorIntegrationTests {
 
-        @Ignore("TODO: Remove after test is implemented")
+		@Ignore("TODO: Remove after test is implemented")
 		@Test
 		public void testOne() {
 

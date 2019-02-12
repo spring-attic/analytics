@@ -40,7 +40,6 @@ public class CounterSinkConfiguration {
 
 	private static final Log logger = LogFactory.getLog(CounterSinkConfiguration.class);
 
-
 	@Autowired
 	private CounterService counterService;
 
