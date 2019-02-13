@@ -117,7 +117,7 @@ public abstract class CounterSinkIntegrationTests {
 			"counter.tag.expression.foo='bar'",
 			"counter.tag.expression.gork='bork'"
 	})
-	public static class CounterWithNameAndTagsTests2 extends CounterSinkIntegrationTests {
+	public static class LiteralTagExpressionsTests extends CounterSinkIntegrationTests {
 
 		@Test
 		public void testCounterSink() {

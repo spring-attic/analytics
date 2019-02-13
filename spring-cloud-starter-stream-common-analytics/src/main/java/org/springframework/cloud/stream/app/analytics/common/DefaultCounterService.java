@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -35,9 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.integration.expression.ExpressionUtils;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -60,21 +56,14 @@ public class DefaultCounterService implements CounterService {
 
 	private MeterRegistry[] meterRegistries;
 
-	private BeanFactory beanFactory;
-
 	private EvaluationContext context;
 
-	@PostConstruct
-	public void init() {
-		this.context = ExpressionUtils.createStandardEvaluationContext(this.beanFactory);
-		logger.info("Counter Properties: " + properties.toString());
-	}
-
-	public DefaultCounterService(CounterCommonProperties properties, ObjectMapper mapper, MeterRegistry[] meterRegistries, BeanFactory beanFactory) {
+	public DefaultCounterService(CounterCommonProperties properties, ObjectMapper mapper,
+			MeterRegistry[] meterRegistries, EvaluationContext context) {
 		this.properties = properties;
 		this.mapper = mapper;
 		this.meterRegistries = meterRegistries;
-		this.beanFactory = beanFactory;
+		this.context = context;
 	}
 
 	@Override

@@ -19,10 +19,13 @@ package org.springframework.cloud.stream.app.analytics.common;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
 
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.integration.context.IntegrationContextUtils;
 
 
 /**
@@ -33,10 +36,14 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({ CounterCommonProperties.class })
 public class CounterCommonConfiguration {
 
+	@Autowired
+	@Qualifier(IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME)
+	private EvaluationContext context;
+
 	@Bean
 	public CounterService counterService(CounterCommonProperties properties, ObjectMapper mapper,
-			MeterRegistry[] meterRegistries, BeanFactory beanFactory) {
-		return new DefaultCounterService(properties, mapper, meterRegistries, beanFactory);
+			MeterRegistry[] meterRegistries) {
+		return new DefaultCounterService(properties, mapper, meterRegistries, context);
 	}
 
 }
