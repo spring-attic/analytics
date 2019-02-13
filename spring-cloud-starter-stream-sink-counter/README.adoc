@@ -1,6 +1,13 @@
 //tag::ref-doc[]
 = Counter Sink
 
+Counter that compute multiple counters from the received messages. It leverages the Micrometer library and can use various popular TSDB to  persist the counter values.
+
+By default the Counter Sink increments the `message`.`name` counter on every received message. The `message-counter-enabled` allows you to disable this counter when required.
+
+If tag expressions are provided (via the `counter.tag.expression.<tagKey>=<tagValue SpEL expression> property) then the `name` counter is incremented. Note that each SpEL  expression can evaluate into multiple values resulting into multiple counter increments (one fore every value resolved).
+
+If fixed tags are provided they are include in all message and expression counter increment measurements.
 
 == Options
 

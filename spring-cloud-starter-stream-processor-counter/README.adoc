@@ -1,6 +1,14 @@
 //tag::ref-doc[]
 = Counter Processor
 
+Pass-Through Processor that computes multiple Counters from the messages that pass through. The input messages are re-send unchanged!
+Using the Micrometer library the Counter Processor integrates with the popular TSDB for persisting and processing the counter values.
+
+By default the Counter Processor increments the `message`.`name` counter on every received message. The `message-counter-enabled` controls the behavior of the message counter.
+
+If tag expressions are provided (via the `counter.tag.expression.<tagKey>=<tagValue SpEL expression> property) then the `name` counter is incremented. Every SpEL expression may evaluate into multiple values causing multiple counter increments for the same message (one fore every value resolved).
+
+If `fixed tags` are provided they are include in all message and expression counters.
 
 == Options
 
