@@ -72,13 +72,6 @@ public class CounterCommonProperties {
 		 */
 		private Map<String, Expression> expression;
 
-		/**
-		 * The field names to extract tag values for the counter increment.
-		 * Single field can produce an array of values, which in turn means distinct name/value tags.
-		 * Every name/value tag causes a separate counter increment.
-		 */
-		private List<String> fields;
-
 		public Map<String, String> getFixed() {
 			return fixed;
 		}
@@ -95,20 +88,11 @@ public class CounterCommonProperties {
 			this.expression = expression;
 		}
 
-		public List<String> getFields() {
-			return fields;
-		}
-
-		public void setFields(List<String> fields) {
-			this.fields = fields;
-		}
-
 		@Override
 		public String toString() {
 			return "MetricsTag{" +
 					"fixed=" + fixed +
 					", expression=" + expression +
-					", fields=" + fields +
 					'}';
 		}
 	}

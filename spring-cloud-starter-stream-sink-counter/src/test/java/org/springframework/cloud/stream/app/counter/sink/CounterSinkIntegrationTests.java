@@ -16,9 +16,7 @@
 
 package org.springframework.cloud.stream.app.counter.sink;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
@@ -138,34 +136,7 @@ public abstract class CounterSinkIntegrationTests {
 
 	@TestPropertySource(properties = {
 			"counter.name=counter666",
-			"counter.tag.fields=test,test2"
-	})
-	public static class FieldValueCounterJsonTests extends CounterSinkIntegrationTests {
-
-		@Test
-		public void testCounterSink() {
-
-			sink.input().send(message("{\"test\": \"Bar\"}"));
-			sink.input().send(message("{\"test\": \"Foo\"}"));
-			sink.input().send(message("{\"test\": \"Bar\"}"));
-
-			sink.input().send(message("{\"test2\": [\"Gork\", \"Gork\", \"Gork\"]}"));
-
-			Counter fooCounter = meterRegistry.find("counter666").tag("test", "Foo").counter();
-			assertThat(fooCounter.count(), is(1.0));
-
-			Counter barCounter = meterRegistry.find("counter666").tag("test", "Bar").counter();
-			assertThat(barCounter.count(), is(2.0));
-
-			Counter gorkCounter = meterRegistry.find("counter666").tag("test2", "Gork").counter();
-			assertThat(gorkCounter.count(), is(3.0));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"counter.name=counter666",
 			"counter.tag.fixed.foo=",
-			"counter.tag.fields=noField",
 			"counter.tag.expression.tag666=#jsonPath(payload,'$..noField')",
 			"counter.tag.expression.test=#jsonPath(payload,'$..test')",
 	})
@@ -178,9 +149,6 @@ public abstract class CounterSinkIntegrationTests {
 
 			Collection<Counter> fixedTagsCounters = meterRegistry.find("counter666").tagKeys("foo").counters();
 			assertThat(fixedTagsCounters.size(), is(0));
-
-			Collection<Counter> fieldsTagsCounters = meterRegistry.find("counter666").tagKeys("noField").counters();
-			assertThat(fieldsTagsCounters.size(), is(0));
 
 			Collection<Counter> expressionTagsCounters = meterRegistry.find("counter666").tagKeys("tag666").counters();
 			assertThat(expressionTagsCounters.size(), is(0));
@@ -213,33 +181,6 @@ public abstract class CounterSinkIntegrationTests {
 		}
 	}
 
-	@TestPropertySource(properties = {
-			"counter.name=counter666",
-			"counter.tag.fields=test"
-	})
-	public static class FieldValueCounterPojoTests2 extends CounterSinkIntegrationTests {
-
-		@Test
-		public void testCounterSink() {
-
-			TestPojoList testPojo = new TestPojoList();
-			List<String> test = new ArrayList<>();
-			test.add("Foo");
-			test.add("Bar");
-			test.add("Foo");
-			testPojo.setTest(test);
-
-			Message<TestPojoList> message = MessageBuilder.withPayload(testPojo).build();
-			sink.input().send(message);
-
-			Counter fooCounter = meterRegistry.find("counter666").tag("test", "Foo").counter();
-			assertThat(fooCounter.count(), is(2.0));
-
-			Counter barCounter = meterRegistry.find("counter666").tag("test", "Bar").counter();
-			assertThat(barCounter.count(), is(1.0));
-		}
-	}
-
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(CounterSinkConfiguration.class)
@@ -249,18 +190,6 @@ public abstract class CounterSinkIntegrationTests {
 		//public Object myMockBean() {
 		// Create here your custom Mock instances to be used with this ITests
 		//}
-	}
-
-	private static class TestPojoList {
-		private List<String> test;
-
-		public List<String> getTest() {
-			return this.test;
-		}
-
-		public void setTest(List<String> test) {
-			this.test = test;
-		}
 	}
 
 	private static Message<byte[]> message(String payload) {

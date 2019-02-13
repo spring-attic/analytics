@@ -31,8 +31,6 @@ import io.micrometer.core.instrument.Tags;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -92,18 +90,6 @@ public class DefaultCounterService implements CounterService {
 			allGroupedTags.putAll(groupedTags);
 		}
 
-		// Field Name/Value Tags Counter
-		if (!CollectionUtils.isEmpty(this.properties.getTag().getFields())) {
-
-			Map<String, List<Tag>> groupedTags = this.properties.getTag().getFields().stream()
-					.map(fieldName -> this.computeFieldValues(fieldName, message).stream()
-							.map(fieldValue -> Tag.of(fieldName, fieldValue))
-							.collect(Collectors.toList())).flatMap(Collection::stream)
-					.collect(Collectors.groupingBy(tag -> tag.getKey(), Collectors.toList()));
-
-			allGroupedTags.putAll(groupedTags);
-		}
-
 		this.count(counterName, fixedTags, allGroupedTags);
 
 		return message;
@@ -131,46 +117,6 @@ public class DefaultCounterService implements CounterService {
 	protected String computeCounterName(Message<?> message) {
 		return this.properties.getComputedNameExpression()
 				.getValue(this.context, message, CharSequence.class).toString();
-	}
-
-	protected List<String> computeFieldValues(String fieldName, Message<?> message) {
-
-		Object payload = message.getPayload();
-
-		if (payload instanceof byte[]) {
-			try {
-				payload = this.mapper.readValue((byte[]) payload, Map.class);
-			}
-			catch (Exception e) {
-				throw new RuntimeException("Not JSON content!", e);
-			}
-		}
-
-		Object value = null;
-		if (payload instanceof Map) {
-			Map map = (Map) payload;
-			if (map.containsKey(fieldName)) {
-				value = map.get(fieldName);
-			}
-			else {
-				logger.error("The property '" + fieldName + "' is not available in the payload: " + payload);
-			}
-		}
-		else {
-			BeanWrapper beanWrapper = new BeanWrapperImpl(payload);
-			if (beanWrapper.isReadableProperty(fieldName)) {
-				value = beanWrapper.getPropertyValue(fieldName);
-			}
-			else {
-				logger.error("The property '" + fieldName + "' is not available in the payload: " + payload);
-			}
-		}
-
-		if (value == null) {
-			logger.info("The value for the property '" + fieldName + "' in the payload '" + payload + "' is null. Ignored");
-		}
-
-		return toList(value);
 	}
 
 	/**
@@ -221,5 +167,4 @@ public class DefaultCounterService implements CounterService {
 			meterRegistry.counter(counterName, tags).increment();
 		}
 	}
-
 }
