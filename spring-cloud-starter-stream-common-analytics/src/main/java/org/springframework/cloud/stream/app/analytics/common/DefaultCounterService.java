@@ -50,16 +50,13 @@ public class DefaultCounterService implements CounterService {
 
 	private CounterCommonProperties properties;
 
-	private ObjectMapper mapper;
-
 	private MeterRegistry[] meterRegistries;
 
 	private EvaluationContext context;
 
-	public DefaultCounterService(CounterCommonProperties properties, ObjectMapper mapper,
-			MeterRegistry[] meterRegistries, EvaluationContext context) {
+	public DefaultCounterService(CounterCommonProperties properties, MeterRegistry[] meterRegistries,
+			EvaluationContext context) {
 		this.properties = properties;
-		this.mapper = mapper;
 		this.meterRegistries = meterRegistries;
 		this.context = context;
 	}

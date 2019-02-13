@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
@@ -86,7 +87,6 @@ public abstract class CounterCommonTests {
 	public static class ExpressionCounterNameTests extends CounterCommonTests {
 
 		@Test
-		@Ignore
 		public void testCounterSink() {
 			IntStream.range(0, 13).forEach(i -> counterService.count(new GenericMessage("hello")));
 			assertThat(meterRegistry.find("message.hello").counter().count(), is(13.0));
@@ -124,7 +124,6 @@ public abstract class CounterCommonTests {
 	})
 	public static class LiteralTagExpressionsTests extends CounterCommonTests {
 
-		@Ignore
 		@Test
 		public void testCounterSink() {
 
@@ -171,7 +170,7 @@ public abstract class CounterCommonTests {
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@Import(CounterCommonConfiguration.class)
+	@Import({ CounterCommonConfiguration.class, SpelExpressionConverterConfiguration.class })
 	public static class TestCounterSinkApplication {
 
 		//@Bean
