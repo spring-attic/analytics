@@ -36,7 +36,7 @@ NOTE: if the https://docs.spring.io/spring-cloud-dataflow/docs/2.0.0.BUILD-SNAPS
 
 Following diagram illustrates Counter's information collection and processing flow.
 
-image::images-asciidoc/MicrometerCounterAppStarter.png[Counter Architecture, scaledwidth="70%"]
+image::{images-asciidoc}/MicrometerCounterAppStarter.png[Counter Architecture, scaledwidth="70%"]
 
 ---
 
