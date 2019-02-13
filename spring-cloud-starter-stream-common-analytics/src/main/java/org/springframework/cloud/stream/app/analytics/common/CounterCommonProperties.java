@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.stream.app.analytics.common;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.AssertTrue;
@@ -50,6 +49,12 @@ public class CounterCommonProperties {
 	 * A SpEL expression (against the incoming Message) to derive the name of the counter to increment.
 	 */
 	private Expression nameExpression;
+
+	/**
+	 * Enables counting the number of messages processed. Uses the 'message.' counter name prefix to distinct it
+	 * form the expression based counter. The message counter includes the fixed tags when provided.
+	 */
+	private boolean messageCounterEnabled = true;
 
 	/**
 	 * Fixed and computed tags to be assignee with the counter increment measurement.
@@ -122,6 +127,14 @@ public class CounterCommonProperties {
 
 	public Expression getComputedNameExpression() {
 		return (nameExpression != null ? nameExpression : new LiteralExpression(getName()));
+	}
+
+	public boolean isMessageCounterEnabled() {
+		return messageCounterEnabled;
+	}
+
+	public void setMessageCounterEnabled(boolean messageCounterEnabled) {
+		this.messageCounterEnabled = messageCounterEnabled;
 	}
 
 	@AssertTrue(message = "exactly one of 'name' and 'nameExpression' must be set")

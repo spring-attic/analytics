@@ -43,6 +43,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -161,6 +162,19 @@ public abstract class CounterCommonTests {
 
 			Collection<Counter> testExpTagsCounters = meterRegistry.find("counter666").tagKeys("test").counters();
 			assertThat(testExpTagsCounters.size(), is(1));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"counter.name=counter666",
+			"counter.messageCounterEnabled=false"
+	})
+	public static class DisabledMessageCounterTests extends CounterCommonTests {
+
+		@Test
+		public void testCounterSink() {
+			IntStream.range(0, 13).forEach(i -> counterService.count(new GenericMessage("hello")));
+			assertNull(meterRegistry.find("message.counter666").counter());
 		}
 	}
 

@@ -70,7 +70,9 @@ public class DefaultCounterService implements CounterService {
 		Tags fixedTags = this.toTags(this.properties.getTag().getFixed());
 
 		// Message Counter
-		this.increment(this.toMessageCounterName(counterName), Tags.of(fixedTags));
+		if (this.properties.isMessageCounterEnabled()) {
+			this.increment(this.toMessageCounterName(counterName), Tags.of(fixedTags));
+		}
 
 		Map<String, List<Tag>> allGroupedTags = new HashMap<>();
 		// Tag Expressions Counter

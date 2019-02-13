@@ -5,6 +5,7 @@
 == Options
 
 //tag::configuration-properties[]
+$$counter.message-counter-enabled$$:: $$Enables counting the number of messages processed. Uses the 'message.' counter name prefix to distinct it form the expression based counter. The message counter includes the fixed tags when provided.$$ *($$Boolean$$, default: `$$true$$`)*
 $$counter.name$$:: $$The name of the counter to increment.$$ *($$String$$, default: `$$<none>$$`)*
 $$counter.name-expression$$:: $$A SpEL expression (against the incoming Message) to derive the name of the counter to increment.$$ *($$Expression$$, default: `$$<none>$$`)*
 $$counter.tag.expression$$:: $$Computes tags from SpEL expression. Single SpEL expression can produce an array of values, which in turn means distinct name/value tags. Every name/value tag will produce a separate counter increment. Tag expression format is: counter.tag.expression.[tag-name]=[SpEL expression]$$ *($$Map<String, Expression>$$, default: `$$<none>$$`)*
