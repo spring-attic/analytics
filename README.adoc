@@ -41,13 +41,13 @@ image::{images-asciidoc}/MicrometerCounterAppStarter.png[Counter Architecture, s
 ---
 
 ### counter sink
-*Description*: TODO
+*Description*: Counter that compute multiple counters from the received messages.
 
 include::spring-cloud-starter-stream-sink-counter/README.adoc[]
 
 ---
 
 ### counter processor
-*Description*: TODO
+*Description*: Pass-Through Processor that computes multiple Counters from the messages that pass through.
 
 include::spring-cloud-starter-stream-processor-counter/README.adoc[]
