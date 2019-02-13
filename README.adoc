@@ -1,6 +1,6 @@
 # Spring Cloud Stream Analytics Applications
 
-:images-asciidoc: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/analytics/master/spring-cloud-starter-stream-common-analytics/src/test/resrouces
+:images-asciidoc: https://github.com/spring-cloud-stream-app-starters/analytics/raw/master/spring-cloud-starter-stream-common-analytics/src/test/resources
 
 
 
