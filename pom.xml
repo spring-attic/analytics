@@ -17,7 +17,6 @@
 	<modules>
 		<module>analytics-app-dependencies</module>
 		<module>spring-cloud-starter-stream-common-analytics</module>
-		<module>analytics-app-starters-test-support</module>
 
 		<module>spring-cloud-starter-stream-sink-counter</module>
 		<module>spring-cloud-starter-stream-processor-counter</module>
