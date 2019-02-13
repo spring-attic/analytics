@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package org.springframework.cloud.stream.app.counter.processor;
 
-import org.junit.Assert;
-import org.junit.Ignore;
+import java.util.Collection;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,6 +35,10 @@ import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Christian Tzolov
@@ -54,23 +60,36 @@ public abstract class CounterProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
+	@Autowired
+	protected SimpleMeterRegistry meterRegistry;
+
 	@TestPropertySource(properties = {
-			"debug=true",
-			"logging.level.*=DEBUG",
+			"counter.name=books",
+			"counter.tag.expression.category=#jsonPath(payload,'$..category')",
+			"counter.tag.expression.author=#jsonPath(payload,'$..author')"
 	})
 	public static class CounterPayloadTests extends CounterProcessorIntegrationTests {
 
-		@Ignore("TODO: Remove after test is implemented")
 		@Test
 		public void testOne() {
 
-			Object payload = null; //TODO: Implement the test payload initialization
-
-			channels.input().send(MessageBuilder.withPayload(payload).build());
+			channels.input().send(MessageBuilder.withPayload(jsonBooksStore.getBytes()).build());
 
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
 
-			Assert.assertNotNull(received);
+			assertThat(received.getPayload().toString(), equalTo(jsonBooksStore));
+
+			Collection<Counter> referenceCounters =
+					meterRegistry.find("books").tag("category", "reference").counters();
+			assertThat(referenceCounters.stream().mapToDouble(c -> c.count()).sum(), is(1.0));
+
+			Collection<Counter> fictionCounters =
+					meterRegistry.find("books").tag("category", "fiction").counters();
+			assertThat(fictionCounters.stream().mapToDouble(c -> c.count()).sum(), is(4.0));
+
+			Collection<Counter> authorTolkienCounters =
+					meterRegistry.find("books").tag("author", "J. R. R. Tolkien").counters();
+			assertThat(authorTolkienCounters.stream().mapToDouble(c -> c.count()).sum(), is(2.0));
 		}
 	}
 
@@ -80,5 +99,47 @@ public abstract class CounterProcessorIntegrationTests {
 	public static class TestCounterProcessorApplication {
 
 	}
+
+	private static Message<byte[]> message(String payload) {
+		return org.springframework.messaging.support.MessageBuilder.withPayload(payload.getBytes()).build();
+	}
+
+	private static String jsonBooksStore = "{ \"store\": {\n" +
+			"    \"book\": [ \n" +
+			"      { \"category\": \"reference\",\n" +
+			"        \"author\": \"Nigel Rees\",\n" +
+			"        \"title\": \"Sayings of the Century\",\n" +
+			"        \"price\": 8.95\n" +
+			"      },\n" +
+			"      { \"category\": \"fiction\",\n" +
+			"        \"author\": \"Evelyn Waugh\",\n" +
+			"        \"title\": \"Sword of Honour\",\n" +
+			"        \"price\": 12.99\n" +
+			"      },\n" +
+			"      { \"category\": \"fiction\",\n" +
+			"        \"author\": \"Herman Melville\",\n" +
+			"        \"title\": \"Moby Dick\",\n" +
+			"        \"isbn\": \"0-553-21311-3\",\n" +
+			"        \"price\": 8.99\n" +
+			"      },\n" +
+			"      { \"category\": \"fiction\",\n" +
+			"        \"author\": \"J. R. R. Tolkien\",\n" +
+			"        \"title\": \"The Lord of the Rings\",\n" +
+			"        \"isbn\": \"0-395-19395-8\",\n" +
+			"        \"price\": 22.99\n" +
+			"      },\n" +
+			"      { \"category\": \"fiction\",\n" +
+			"        \"author\": \"J. R. R. Tolkien\",\n" +
+			"        \"title\": \"The Hobbit\",\n" +
+			"        \"isbn\": \"0-395-19395-8\",\n" +
+			"        \"price\": 22.99\n" +
+			"      }\n" +
+			"    ],\n" +
+			"    \"bicycle\": {\n" +
+			"      \"color\": \"red\",\n" +
+			"      \"price\": 19.95\n" +
+			"    }\n" +
+			"  }\n" +
+			"}";
 
 }

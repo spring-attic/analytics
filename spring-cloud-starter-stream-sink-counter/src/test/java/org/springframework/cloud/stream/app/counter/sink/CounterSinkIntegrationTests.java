@@ -120,9 +120,7 @@ public abstract class CounterSinkIntegrationTests {
 		@Test
 		public void testCounterSink() {
 
-			for (int i = 0; i < 13; i++) {
-				sink.input().send(new GenericMessage("hello"));
-			}
+			IntStream.range(0, 13).forEach(i -> sink.input().send(new GenericMessage("hello")));
 
 			Counter fooCounter = meterRegistry.find("counter666").tag("foo", "bar").counter();
 			assertThat(fooCounter.count(), is(13.0));
@@ -185,11 +183,6 @@ public abstract class CounterSinkIntegrationTests {
 	@EnableAutoConfiguration
 	@Import(CounterSinkConfiguration.class)
 	public static class TestCounterSinkApplication {
-
-		//@Bean
-		//public Object myMockBean() {
-		// Create here your custom Mock instances to be used with this ITests
-		//}
 	}
 
 	private static Message<byte[]> message(String payload) {
