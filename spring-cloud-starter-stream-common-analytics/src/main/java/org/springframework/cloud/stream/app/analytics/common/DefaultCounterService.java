@@ -145,6 +145,7 @@ public class DefaultCounterService implements CounterService {
 						: Arrays.asList(ObjectUtils.toObjectArray(value));
 
 				return valueCollection.stream()
+						.filter(v -> v != null)
 						.map(Object::toString)
 						.filter(StringUtils::hasText)
 						.collect(Collectors.toList());

@@ -148,7 +148,6 @@ public abstract class CounterCommonTests {
 	})
 	public static class EmptyTagsTests extends CounterCommonTests {
 
-		@Ignore
 		@Test
 		public void testCounterSink() {
 
@@ -162,6 +161,30 @@ public abstract class CounterCommonTests {
 
 			Collection<Counter> testExpTagsCounters = meterRegistry.find("counter666").tagKeys("test").counters();
 			assertThat(testExpTagsCounters.size(), is(1));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"counter.name=counter666",
+			"counter.tag.fixed.foo=",
+			"counter.tag.expression.tag666=#jsonPath(payload,'$..noField')",
+			"counter.tag.expression.test=#jsonPath(payload,'$..test')",
+	})
+	public static class NullTagsTests extends CounterCommonTests {
+
+		@Test
+		public void testCounterSink() {
+
+			counterService.count(message("{\"test\": null}"));
+
+			Collection<Counter> fixedTagsCounters = meterRegistry.find("counter666").tagKeys("foo").counters();
+			assertThat(fixedTagsCounters.size(), is(0));
+
+			Collection<Counter> expressionTagsCounters = meterRegistry.find("counter666").tagKeys("tag666").counters();
+			assertThat(expressionTagsCounters.size(), is(0));
+
+			Collection<Counter> testExpTagsCounters = meterRegistry.find("counter666").tagKeys("test").counters();
+			assertThat(testExpTagsCounters.size(), is(0));
 		}
 	}
 
