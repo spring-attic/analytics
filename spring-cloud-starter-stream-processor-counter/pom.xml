@@ -54,11 +54,6 @@
                         </counter-processor>
                     </generatedApps>
                     <enableContainerImageMetadata>true</enableContainerImageMetadata>
-                    <metadataSourceTypeFilters>
-                        <filter>org.springframework.cloud.stream.app.counter.processor.CounterProcessorProperties</filter>
-                        <filter>org.springframework.cloud.stream.app.analytics.common.CounterCommonProperties</filter>
-                        <filter>org.springframework.cloud.stream.app.analytics.common.CounterCommonProperties$MetricsTag</filter>
-                    </metadataSourceTypeFilters>
                 </configuration>
             </plugin>
         </plugins>

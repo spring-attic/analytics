@@ -54,11 +54,6 @@
                         </counter-sink>
                     </generatedApps>
                     <enableContainerImageMetadata>true</enableContainerImageMetadata>
-                    <metadataSourceTypeFilters>
-                        <filter>org.springframework.cloud.stream.app.counter.sink.CounterSinkProperties</filter>
-                        <filter>org.springframework.cloud.stream.app.analytics.common.CounterCommonProperties</filter>
-                        <filter>org.springframework.cloud.stream.app.analytics.common.CounterCommonProperties$MetricsTag</filter>
-                    </metadataSourceTypeFilters>
                 </configuration>
             </plugin>
         </plugins>
