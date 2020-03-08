@@ -41,14 +41,22 @@ public class CounterCommonProperties {
 	private String defaultName;
 
 	/**
-	 * The name of the counter to increment.
+	 * The name of the counter to increment. The 'name' and 'nameExpression' are mutually exclusive.
+	 * Only one can be set.
 	 */
 	private String name;
 
 	/**
 	 * A SpEL expression (against the incoming Message) to derive the name of the counter to increment.
+	 * The 'name' and 'nameExpression' are mutually exclusive. Only one can be set.
 	 */
 	private Expression nameExpression;
+
+	/**
+	 * A SpEL expression (against the incoming Message) to derive the amount to add to the counter.
+	 * If not set the counter is incremented by 1.0
+	 */
+	private Expression amountExpression;
 
 	/**
 	 * Enables counting the number of messages processed. Uses the 'message.' counter name prefix to distinct it
@@ -123,6 +131,18 @@ public class CounterCommonProperties {
 
 	public void setNameExpression(Expression nameExpression) {
 		this.nameExpression = nameExpression;
+	}
+
+	public Expression getAmountExpression() {
+		return amountExpression;
+	}
+
+	public void setAmountExpression(Expression amountExpression) {
+		this.amountExpression = amountExpression;
+	}
+
+	public Expression getComputedAmountExpression() {
+		return (amountExpression != null ? amountExpression : new LiteralExpression("1.0"));
 	}
 
 	public Expression getComputedNameExpression() {

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
@@ -71,8 +70,10 @@ public class DefaultCounterService implements CounterService {
 
 		// Message Counter
 		if (this.properties.isMessageCounterEnabled()) {
-			this.increment(this.toMessageCounterName(counterName), Tags.of(fixedTags));
+			this.increment(this.toMessageCounterName(counterName), Tags.of(fixedTags), 1.0);
 		}
+
+		double amount = computeCounterAmount(message);
 
 		Map<String, List<Tag>> allGroupedTags = new HashMap<>();
 		// Tag Expressions Counter
@@ -89,7 +90,7 @@ public class DefaultCounterService implements CounterService {
 			allGroupedTags.putAll(groupedTags);
 		}
 
-		this.count(counterName, fixedTags, allGroupedTags);
+		this.count(counterName, fixedTags, allGroupedTags, amount);
 
 		return message;
 	}
@@ -98,7 +99,7 @@ public class DefaultCounterService implements CounterService {
 		return MESSAGE_COUNTER_PREFIX + commonCounterName;
 	}
 
-	private void count(String counterName, Tags fixedTags, Map<String, List<Tag>> groupedTags) {
+	private void count(String counterName, Tags fixedTags, Map<String, List<Tag>> groupedTags, double amount) {
 		if (!CollectionUtils.isEmpty(groupedTags)) {
 			int max = groupedTags.values().stream().map(l -> l.size()).max(Integer::compareTo).get();
 			for (int i = 0; i < max; i++) {
@@ -108,7 +109,7 @@ public class DefaultCounterService implements CounterService {
 							currentTags.and(e.getValue().get(i)) :
 							currentTags.and(Tags.of(e.getKey(), ""));
 				}
-				this.increment(counterName, currentTags);
+				this.increment(counterName, currentTags, amount);
 			}
 		}
 	}
@@ -116,6 +117,10 @@ public class DefaultCounterService implements CounterService {
 	protected String computeCounterName(Message<?> message) {
 		return this.properties.getComputedNameExpression()
 				.getValue(this.context, message, CharSequence.class).toString();
+	}
+
+	protected double computeCounterAmount(Message<?> message) {
+		return this.properties.getComputedAmountExpression().getValue(this.context, message, double.class);
 	}
 
 	/**
@@ -159,12 +164,13 @@ public class DefaultCounterService implements CounterService {
 
 	/**
 	 * Increment the counterName increment for every configured MaterRegistry.
-	 * @param counterName The increment to increment.
+	 * @param counterName The name of the counter being incremented.
 	 * @param tags List of tags (e.g. dimensions) associated with this increment increment.
+	 * @param amount The amount to add to the counter.
 	 */
-	protected void increment(String counterName, Iterable<Tag> tags) {
+	protected void increment(String counterName, Iterable<Tag> tags, double amount) {
 		for (MeterRegistry meterRegistry : this.meterRegistries) {
-			meterRegistry.counter(counterName, tags).increment();
+			meterRegistry.counter(counterName, tags).increment(amount);
 		}
 	}
 }

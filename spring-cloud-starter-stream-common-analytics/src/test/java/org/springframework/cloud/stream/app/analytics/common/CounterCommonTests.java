@@ -83,6 +83,23 @@ public abstract class CounterCommonTests {
 	}
 
 	@TestPropertySource(properties = {
+			"counter.name=counter666",
+			"counter.tag.expression.foo='bar'",
+			"counter.amount-expression=payload.length()"
+	})
+	public static class CountWithAmountTest extends CounterCommonTests {
+
+		@Test
+		public void testCounterSink() {
+			String message = "hello world message";
+			double messageSize = Long.valueOf(message.length()).doubleValue();
+			counterService.count(new GenericMessage(message));
+			assertThat(meterRegistry.find("message.counter666").counter().count(), is(1.0));
+			assertThat(meterRegistry.find("counter666").counter().count(), is(messageSize));
+		}
+	}
+
+	@TestPropertySource(properties = {
 			"counter.name-expression=payload"
 	})
 	public static class ExpressionCounterNameTests extends CounterCommonTests {
